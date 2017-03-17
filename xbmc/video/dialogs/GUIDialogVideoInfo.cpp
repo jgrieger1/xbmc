@@ -56,6 +56,7 @@
 #include "filesystem/VideoDatabaseDirectory/QueryParams.h"
 #include "utils/FileUtils.h"
 #include "utils/Variant.h"
+#include "network/upnp/UPnP.h"
 
 #include <iterator>
 
@@ -112,6 +113,12 @@ bool CGUIDialogVideoInfo::OnMessage(CGUIMessage& message)
 
       if (m_startUserrating != m_movieItem->GetVideoInfoTag()->m_iUserRating)
       {
+#ifdef HAS_UPNP
+        if (URIUtils::IsUPnP(m_movieItem->GetPath()))
+        {
+          UPNP::CUPnP::SetUserRating(*m_movieItem, m_startUserrating);
+        }
+#endif
         CVideoDatabase db;
         if (db.Open())
         {
