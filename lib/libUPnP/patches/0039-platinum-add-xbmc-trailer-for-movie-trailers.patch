@@ -1,0 +1,109 @@
+From 6c9b58e513ddb4e74664c094b20871bcea024bca Mon Sep 17 00:00:00 2001
+From: Jeff Grieger <Jeff@Griegers.com>
+Date: Thu, 16 Mar 2017 23:09:52 -0400
+Subject: [PATCH] platinum: add xbmc:trailer for movie trailers
+
+---
+ lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.cpp    |  2 ++
+ lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.h      |  2 ++
+ .../Platinum/Source/Devices/MediaServer/PltMediaItem.cpp       | 10 ++++++++++
+ lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.h |  1 +
+ .../Platinum/Source/Devices/MediaServer/PltSyncMediaBrowser.h  |  2 +-
+ 5 files changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.cpp b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.cpp
+index b1ba66f..c187b75 100644
+--- a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.cpp
++++ b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.cpp
+@@ -177,6 +177,8 @@ PLT_Didl::ConvertFilterToMask(const NPT_String& filter)
+           mask |= PLT_FILTER_MASK_XBMC_COUNTRY;
+         } else if (NPT_String::CompareN(s + i, PLT_FILTER_FIELD_XBMC_USERRATING, len, true) == 0) {
+           mask |= PLT_FILTER_MASK_XBMC_USERRATING;
++        } else if (NPT_String::CompareN(s + i, PLT_FILTER_FIELD_XBMC_TRAILER, len, true) == 0) {
++          mask |= PLT_FILTER_MASK_XBMC_TRAILER;
+         }
+ 
+         if (next_comma < 0) {
+diff --git a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.h b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.h
+index 1705f9c..690f900 100644
+--- a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.h
++++ b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltDidl.h
+@@ -102,6 +102,7 @@
+ #define PLT_FILTER_MASK_XBMC_UNIQUE_IDENTIFIER      NPT_UINT64_C(0x0001000000000000)
+ #define PLT_FILTER_MASK_XBMC_COUNTRY                NPT_UINT64_C(0x0002000000000000)
+ #define PLT_FILTER_MASK_XBMC_USERRATING             NPT_UINT64_C(0x0004000000000000)
++#define PLT_FILTER_MASK_XBMC_TRAILER                NPT_UINT64_C(0x0008000000000000)
+ 
+ #define PLT_FILTER_FIELD_TITLE                      "dc:title"
+ #define PLT_FILTER_FIELD_CREATOR                    "dc:creator"
+@@ -154,6 +155,7 @@
+ #define PLT_FILTER_FIELD_XBMC_UNIQUE_IDENTIFIER     "xbmc:uniqueidentifier"
+ #define PLT_FILTER_FIELD_XBMC_COUNTRY               "xbmc:country"
+ #define PLT_FILTER_FIELD_XBMC_USERRATING            "xbmc:userrating"
++#define PLT_FILTER_FIELD_XBMC_TRAILER               "xbmc:trailer"
+ 
+ extern const char* didl_header;
+ extern const char* didl_footer;
+diff --git a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.cpp b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.cpp
+index 96839e4..2197c22 100644
+--- a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.cpp
++++ b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.cpp
+@@ -263,6 +263,7 @@ PLT_MediaObject::Reset()
+     m_XbmcInfo.unique_identifier = "";
+     m_XbmcInfo.countries.Clear();
+     m_XbmcInfo.user_rating = 0;
++    m_XbmcInfo.trailer = "";
+ 
+     m_Didl = "";
+ 
+@@ -625,6 +626,13 @@ PLT_MediaObject::ToDidl(NPT_UInt64 mask, NPT_String& didl)
+       didl += "</xbmc:userrating>";
+     }
+ 
++    // trailer
++    if ((mask & PLT_FILTER_MASK_XBMC_TRAILER) && !m_XbmcInfo.trailer.IsEmpty()) {
++      didl += "<xbmc:trailer>";
++      PLT_Didl::AppendXmlEscape(didl, m_XbmcInfo.trailer);
++      didl += "</xbmc:trailer>";
++    }
++
+     // class is required
+     didl += "<upnp:class";
+ 	if (!m_ObjectClass.friendly_name.IsEmpty()) {
+@@ -852,6 +860,8 @@ PLT_MediaObject::FromDidl(NPT_XmlElementNode* entry)
+ 
+     PLT_XmlHelper::GetChildText(entry, "uniqueidentifier", m_XbmcInfo.unique_identifier, didl_namespace_xbmc, 256);
+ 
++    PLT_XmlHelper::GetChildText(entry, "trailer", m_XbmcInfo.trailer, didl_namespace_xbmc, 256);
++
+     // re serialize the entry didl as a we might need to pass it to a renderer
+     // we may have modified the tree to "fix" issues, so as not to break a renderer
+     // (don't write xml prefix as this didl could be part of a larger document)
+diff --git a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.h b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.h
+index 5712b9a..f9acfa5 100644
+--- a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.h
++++ b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltMediaItem.h
+@@ -172,6 +172,7 @@ typedef struct {
+   NPT_String unique_identifier;
+   NPT_List<NPT_String> countries;
+   NPT_Int32 user_rating;
++  NPT_String trailer;
+ } PLT_XbmcInfo;
+ 
+ typedef struct {
+diff --git a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltSyncMediaBrowser.h b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltSyncMediaBrowser.h
+index e52fb5a..74209bb 100644
+--- a/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltSyncMediaBrowser.h
++++ b/lib/libUPnP/Platinum/Source/Devices/MediaServer/PltSyncMediaBrowser.h
+@@ -70,7 +70,7 @@ typedef struct PLT_CapabilitiesData {
+ typedef NPT_Reference<PLT_CapabilitiesData> PLT_CapabilitiesDataReference;
+ 
+ // explicitely specify res otherwise WMP won't return a URL!
+-#define PLT_DEFAULT_FILTER  "dc:date,dc:description,upnp:longDescription,upnp:genre,res,res@duration,res@size,upnp:albumArtURI,upnp:rating,upnp:lastPlaybackPosition,upnp:lastPlaybackTime,upnp:playbackCount,upnp:originalTrackNumber,upnp:episodeNumber,upnp:programTitle,upnp:seriesTitle,upnp:album,upnp:artist,upnp:author,upnp:director,dc:publisher,searchable,childCount,dc:title,dc:creator,upnp:actor,res@resolution,upnp:episodeCount,upnp:episodeSeason,xbmc:dateadded,xbmc:rating,xbmc:votes,xbmc:artwork,xbmc:uniqueidentifier,xbmc:country,xbmc:userrating"
++#define PLT_DEFAULT_FILTER  "dc:date,dc:description,upnp:longDescription,upnp:genre,res,res@duration,res@size,upnp:albumArtURI,upnp:rating,upnp:lastPlaybackPosition,upnp:lastPlaybackTime,upnp:playbackCount,upnp:originalTrackNumber,upnp:episodeNumber,upnp:programTitle,upnp:seriesTitle,upnp:album,upnp:artist,upnp:author,upnp:director,dc:publisher,searchable,childCount,dc:title,dc:creator,upnp:actor,res@resolution,upnp:episodeCount,upnp:episodeSeason,xbmc:dateadded,xbmc:rating,xbmc:votes,xbmc:artwork,xbmc:uniqueidentifier,xbmc:country,xbmc:userrating,xbmc:trailer"
+ 
+ /*----------------------------------------------------------------------
+ |   PLT_MediaContainerListener
+-- 
+2.10.1.windows.1
+
