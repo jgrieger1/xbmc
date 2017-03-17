@@ -714,6 +714,12 @@ bool CGUIWindowVideoBase::OnItemInfo(int iItem)
     else
       strDir = URIUtils::GetDirectory(item->GetPath());
 
+    if (URIUtils::IsUPnP(strDir) && item->IsVideo())
+    {
+      CGUIDialogVideoInfo::ShowFor(*item);
+      return true;
+    }
+
     SScanSettings settings;
     bool foundDirectly = false;
     scraper = m_database.GetScraperForPath(strDir, settings, foundDirectly);
