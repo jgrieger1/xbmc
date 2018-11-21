@@ -826,6 +826,11 @@ PLT_MediaObject::FromDidl(NPT_XmlElementNode* entry)
         PLT_XmlHelper::GetAttribute(children[i], "protection", resource.m_Protection, "", 256);
         PLT_XmlHelper::GetAttribute(children[i], "resolution", resource.m_Resolution, "", 256);
 
+        if (NPT_SUCCEEDED(PLT_XmlHelper::GetAttribute(children[i], "nrAudioChannels", str, "", 256))) {
+            if (NPT_FAILED(str.ToInteger32(resource.m_NbAudioChannels))) resource.m_NbAudioChannels = (NPT_UInt32)-1;
+            PLT_XmlHelper::RemoveAttribute(children[i], "nrAudioChannels");
+        }
+
         if (NPT_SUCCEEDED(PLT_XmlHelper::GetAttribute(children[i], "size", str, "", 256))) {
             if (NPT_FAILED(str.ToInteger64(resource.m_Size))) resource.m_Size = (NPT_Size)-1;
         }
