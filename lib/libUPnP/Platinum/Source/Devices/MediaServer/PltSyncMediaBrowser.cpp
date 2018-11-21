@@ -248,7 +248,29 @@ PLT_SyncMediaBrowser::OnMSStateVariablesChanged(PLT_Service*                  se
                 value = (index<0)?"":value.SubString(index+1);
 
                 // clear cache for that device
-                if (m_UseCache) m_Cache.Clear(device->GetUUID(), item_id);
+                PLT_MediaObjectListReference list;
+                if (m_UseCache && NPT_SUCCEEDED(m_Cache.Get(device->GetUUID(), item_id, list)))
+                {
+                    if (list.IsNull()) return;
+                    PLT_MediaObjectList::Iterator entry = list->GetFirstItem();
+                    while (entry) {
+                        if ((*entry)->IsContainer())
+                        {
+                            // do not clear cache for child containers
+                            ++entry;
+                            continue;
+                        }
+                        NPT_String id;
+                        if ((*entry)->m_ReferenceID.IsEmpty())
+                            id = (const NPT_String)(*entry)->m_ObjectID;
+                        else
+                            id = (const NPT_String)(*entry)->m_ReferenceID;
+                        m_Cache.Clear(device->GetUUID(), id);
+
+                        ++entry;
+                    }
+                    m_Cache.Clear(device->GetUUID(), item_id);
+                }
 
                 // notify listener
                 if (m_ContainerListener) m_ContainerListener->OnContainerChanged(device, item_id, update_id);
