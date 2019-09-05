@@ -185,7 +185,7 @@ keytool -genkey -keystore ~/.android/debug.keystore -v -alias androiddebugkey -d
 ## 4. Get the source code
 Change to your `home` directory:
 ```
-cd $HOME
+cd $HOME/src
 ```
 
 Clone this Kodi's default master branch:
@@ -196,7 +196,7 @@ git clone https://github.com/jgrieger1/xbmc.git kodi
 ## 5. Build tools and dependencies
 Prepare to configure build:
 ```
-cd $HOME/kodi/tools/depends
+cd $HOME/src/kodi/tools/depends
 ./bootstrap
 ```
 
@@ -234,7 +234,7 @@ You can find a complete list of available binary add-ons **[here](https://github
 
 Change to Kodi's source code directory:
 ```
-cd $HOME/kodi
+cd $HOME/src/kodi
 ```
 
 Build all add-ons:
@@ -257,13 +257,13 @@ make -j$(getconf _NPROCESSORS_ONLN) -C tools/depends/target/binary-addons ADDONS
 ## 7. Build Kodi
 Configure CMake build:
 ```
-cd $HOME/kodi
+cd $HOME/src/kodi
 make -C tools/depends/target/cmakebuildsys
 ```
 
 Build Kodi:
 ```
-cd $HOME/kodi/build
+cd $HOME/src/kodi/build
 make -j$(getconf _NPROCESSORS_ONLN)
 ```
 
@@ -277,7 +277,7 @@ Create package:
 make apk
 ```
 
-Generated `apk` file will be inside `$HOME/kodi`.
+Generated `apk` file will be inside `$HOME/src/kodi`.
 
 **[back to top](#table-of-contents)**
 
@@ -291,7 +291,7 @@ sudo apt install adb
 
 Install Kodi:
 ```
-cd $HOME/kodi-android
+cd $HOME/src/kodi-android
 adb devices
 adb -s <device-id> install -r <generated-apk-name-here>.apk
 ```
