@@ -85,7 +85,48 @@ unzip $HOME/Downloads/sdk-tools-linux-4333796.zip -d $HOME/android-tools/android
 
 Extract Android NDK:
 ```
-unzip $HOME/Downloads/android-ndk-r18-linux-x86_64.zip -d $HOME/android-tools
+unzip $HOME/Downloads/android-ndk-r18b-linux-x86_64.zip -d $HOME/android-tools
+```
+
+### 3.1.1.  Install Java 8 if needed
+Android SDK requires Java 8.  Install Java 8 if not already installed.
+
+For Debian Buster, use the following steps:
+
+Since Java 8 is not available as a package in the Buster repository, we'll be using unstalbe.  To ensure that future package installations/updates default to stable (Buster), make sure default configuration option is set to stable.
+```
+echo 'APT::Default-Release "stable";' > /etc/apt/apt.conf.d/99defaultrelease
+```
+
+Edit Debian sources.list for adding unstable repository:
+```
+vi /etc/apt/sources.list
+```
+Add the unstable repository to the sources.list
+```
+deb http://deb.debian.org/debian/ unstable main
+deb-src http://deb.debian.org/debian/ unstable main
+```
+
+Update the package repositories:
+```
+apt update
+```
+
+Make sure Java 8 package can be installed:
+```
+apt-cache policy openjdk-8-jdk
+```
+
+Install the Java 8 package:
+```
+apt install openjdk-8-jdk
+```
+
+### 3.1.2. Set JAVA_HOME environment variable to Java 8 installation
+If system defaults to using a Java version greater then 8, set the JAVA_HOME environment variable to Java 8 installation directory:
+```
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 ```
 
 ### 3.2. Configure Android SDK
@@ -103,7 +144,7 @@ To be able to build Kodi and the libraries it depends on for the Android platfor
 
 Change to Android NDK tools directory:
 ```
-cd $HOME/android-tools/android-ndk-r18/build/tools
+cd $HOME/android-tools/android-ndk-r18b/build/tools
 ```
 
 Set up the aarch64 toolchain:
@@ -147,9 +188,9 @@ Change to your `home` directory:
 cd $HOME
 ```
 
-Clone Kodi's current master branch:
+Clone this Kodi's default master branch:
 ```
-git clone https://github.com/xbmc/xbmc kodi
+git clone https://github.com/jgrieger1/xbmc.git kodi
 ```
 
 ## 5. Build tools and dependencies
@@ -163,17 +204,17 @@ cd $HOME/kodi/tools/depends
 
 Configure build for aarch64:
 ```
-./configure --with-tarballs=$HOME/android-tools/xbmc-tarballs --host=aarch64-linux-android --with-sdk-path=$HOME/android-tools/android-sdk-linux --with-ndk-path=$HOME/android-tools/android-ndk-r18 --with-toolchain=$HOME/android-tools/aarch64-linux-android-vanilla/android-21 --prefix=$HOME/android-tools/xbmc-depends
+./configure --with-tarballs=$HOME/android-tools/xbmc-tarballs --host=aarch64-linux-android --with-sdk-path=$HOME/android-tools/android-sdk-linux --with-ndk-path=$HOME/android-tools/android-ndk-r18 --with-toolchain=$HOME/android-tools/aarch64-linux-android-vanilla/android-21 --prefix=$HOME/android-tools/xbmc-depends --disable-debug
 ```
 
 Or configure build for arm:
 ```
-./configure --with-tarballs=$HOME/android-tools/xbmc-tarballs --host=arm-linux-androideabi --with-sdk-path=$HOME/android-tools/android-sdk-linux --with-ndk-path=$HOME/android-tools/android-ndk-r18 --with-toolchain=$HOME/android-tools/arm-linux-androideabi-vanilla/android-21 --prefix=$HOME/android-tools/xbmc-depends
+./configure --with-tarballs=$HOME/android-tools/xbmc-tarballs --host=arm-linux-androideabi --with-sdk-path=$HOME/android-tools/android-sdk-linux --with-ndk-path=$HOME/android-tools/android-ndk-r18 --with-toolchain=$HOME/android-tools/arm-linux-androideabi-vanilla/android-21 --prefix=$HOME/android-tools/xbmc-depends --disable-debug
 ```
 
 Or configure build for x86:
 ```
-./configure --with-tarballs=$HOME/android-tools/xbmc-tarballs --host=i686-linux-android --with-sdk-path=$HOME/android-tools/android-sdk-linux --with-ndk-path=$HOME/android-tools/android-ndk-r18 --with-toolchain=$HOME/android-tools/x86-linux-android-vanilla/android-21 --prefix=$HOME/android-tools/xbmc-depends
+./configure --with-tarballs=$HOME/android-tools/xbmc-tarballs --host=i686-linux-android --with-sdk-path=$HOME/android-tools/android-sdk-linux --with-ndk-path=$HOME/android-tools/android-ndk-r18 --with-toolchain=$HOME/android-tools/x86-linux-android-vanilla/android-21 --prefix=$HOME/android-tools/xbmc-depends --disable-debug
 ```
 
 Build tools and dependencies:
