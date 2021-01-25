@@ -99,3 +99,28 @@ JSONRPC_STATUS CSystemOperations::GetPropertyValue(int permissions, const std::s
 
   return OK;
 }
+
+JSONRPC_STATUS CSystemOperations::CECToggleState(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
+{
+  bool CecResult;
+  CApplicationMessenger::GetInstance().SendMsg(TMSG_CECTOGGLESTATE, 0, 0, static_cast<void*>(&CecResult));
+  return ACK;
+}
+
+JSONRPC_STATUS CSystemOperations::CECActivateSource(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
+{
+  CApplicationMessenger::GetInstance().PostMsg(TMSG_CECACTIVATESOURCE);
+  return ACK;
+}
+
+JSONRPC_STATUS CSystemOperations::CECStandby(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
+{
+  CApplicationMessenger::GetInstance().PostMsg(TMSG_CECSTANDBY);
+  return ACK;
+}
+
+JSONRPC_STATUS CSystemOperations::CECSend(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
+{
+  CApplicationMessenger::GetInstance().PostMsg(TMSG_CECSEND, 0, -1, nullptr, parameterObject["command"].asString());
+  return ACK;
+}

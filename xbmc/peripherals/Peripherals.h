@@ -198,6 +198,12 @@ namespace PERIPHERALS
     bool ToggleDeviceState(const CecStateChange mode = STATE_SWITCH_TOGGLE);
 
     /*!
+     * @brief Send custom CEC command via a CEC peripheral.
+     * @param cecCommand Custom CEC command to send.
+     */
+    void CECSend(const char* cecCommand);
+
+    /*!
      * @brief Try to mute the audio via a peripheral.
      * @return True when this change was handled by a peripheral (and should not be handled by anything else), false otherwise.
      */

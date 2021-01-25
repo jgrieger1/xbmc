@@ -2321,6 +2321,40 @@
     "params": [],
     "returns": "string"
   },
+  "System.CECToggleState": {
+    "type": "method",
+    "description": "Toggle state of playing device via a CEC peripheral",
+    "transport": "Response",
+    "permission": "ControlSystem",
+    "params": [],
+    "returns": "string"
+  },
+  "System.CECActivateSource": {
+    "type": "method",
+    "description": "Wake up playing device via a CEC peripheral",
+    "transport": "Response",
+    "permission": "ControlSystem",
+    "params": [],
+    "returns": "string"
+  },
+  "System.CECStandby": {
+    "type": "method",
+    "description": "Put playing device on standby via a CEC peripheral",
+    "transport": "Response",
+    "permission": "ControlSystem",
+    "params": [],
+    "returns": "string"
+  },
+  "System.CECSend": {
+    "type": "method",
+    "description": "Send custom CEC command via a CEC peripheral",
+    "transport": "Response",
+    "permission": "ControlSystem",
+    "params": [
+      { "name": "command", "type": "string", "required": true, "description": "custom CEC command to send" }
+    ],
+    "returns": "string"
+  },
   "Input.SendText": {
     "type": "method",
     "description": "Send a generic (unicode) text",
